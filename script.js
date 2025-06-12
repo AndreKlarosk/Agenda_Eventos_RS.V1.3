@@ -215,6 +215,22 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    async function getEventsForYear(year) {
+        return new Promise((resolve, reject) => {
+            const transaction = db.transaction(['events'], 'readonly');
+            const store = transaction.objectStore('events');
+            const request = store.getAll();
+
+            request.onsuccess = () => {
+                const allEvents = request.result;
+                const yearEvents = allEvents.filter(e => e.id.startsWith(`${year}-`));
+                resolve(yearEvents);
+            };
+
+            request.onerror = (event) => reject("Erro ao buscar eventos do ano:", event.target.errorCode);
+        });
+    }
+
     async function getEventsForDate(dateStr) {
         return new Promise((resolve, reject) => {
             const transaction = db.transaction(['events'], 'readonly');
@@ -236,33 +252,32 @@ document.addEventListener('DOMContentLoaded', () => {
         const doc = new jsPDF();
 
         const year = currentDate.getFullYear();
-        const month = currentDate.getMonth();
-        const monthName = new Date(year, month).toLocaleString('pt-br', { month: 'long' });
-
         doc.setFontSize(20);
-        doc.text(`Relatório de Eventos - ${monthName.charAt(0).toUpperCase() + monthName.slice(1)} ${year}`, 14, 22);
+        doc.text(`Relatório Anual de Eventos - ${year}`, 14, 22);
 
-        const events = await getEventsForMonth(year, month);
+        const events = await getEventsForYear(year);
 
         if (events.length === 0) {
             doc.setFontSize(12);
-            doc.text("Nenhum evento agendado para este mês.", 14, 35);
+            doc.text("Nenhum evento agendado para este ano.", 14, 35);
         } else {
-            // Ordena os eventos pela data, como você já faz
+            // Ordena os eventos pela data e depois pela hora
             events.sort((a, b) => {
-                const dateA = a.id.split('-').slice(0, 3).join('-'); // Pega YYYY-MM-DD
-                const dateB = b.id.split('-').slice(0, 3).join('-'); // Pega YYYY-MM-DD
-                return new Date(dateA) - new Date(dateB);
+                const dateA = a.id.split('-').slice(0, 3).join('-');
+                const dateB = b.id.split('-').slice(0, 3).join('-');
+
+                if (dateA !== dateB) {
+                    return new Date(dateA) - new Date(dateB);
+                }
+                const hourA = a.hour || '00:00';
+                const hourB = b.hour || '00:00';
+                return hourA.localeCompare(hourB);
             });
 
             const tableBody = events.map(event => {
-                // A data já está armazenada no formato YYYY-MM-DD no início do ID
-                // Basta extrair essa parte do ID para usar diretamente
-                const datePart = event.id.split('-').slice(0, 3).join('-'); // Pega "YYYY-MM-DD"
-                
-                // Converte para o formato dd/mm/yyyy para exibição
+                const datePart = event.id.split('-').slice(0, 3).join('-');
                 const [y, m, d] = datePart.split('-');
-                const formattedDate = `${d}/${m}/${y}`; // Formato dd/mm/yyyy para o Brasil
+                const formattedDate = `${d}/${m}/${y}`;
 
                 const participants = event.participants && event.participants.length > 0 ? event.participants.join(', ') : "Nenhum";
                 return [
@@ -274,7 +289,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 ];
             });
 
-
             doc.autoTable({
                 head: [["Data", "Horário", "Título", "Descrição", "Participantes"]],
                 body: tableBody,
@@ -282,7 +296,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
-        doc.save(`Relatorio_${monthName}_${year}.pdf`);
+        doc.save(`Relatorio_Anual_${year}.pdf`);
     }
 
     // EVENT LISTENERS
