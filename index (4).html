@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agenda Profissional</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="calendar-container">
+        <div id="calendar-header">
+            <button id="prev-month-btn"><span>&lt;</span></button> <h2 id="month-year-str"></h2>
+            <button id="next-month-btn"><span>&gt;</span></button> </div>
+        <div id="weekdays-container">
+            <div>Dom</div>
+            <div>Seg</div>
+            <div>Ter</div>
+            <div>Qua</div>
+            <div>Qui</div>
+            <div>Sex</div>
+            <div>Sáb</div>
+        </div>
+        <div id="calendar-days"></div>
+        <button id="export-pdf-btn">Exportar Mês como PDF</button>
+    </div>
+
+    <div id="event-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <h3 id="modal-title">Adicionar Evento</h3>
+            <input type="hidden" id="event-id">
+            <input type="text" id="event-title-input" placeholder="Título do Evento" required>
+            <input type="time" id="event-hour-input" placeholder="Hora do Evento" required>
+            <textarea id="event-desc-input" placeholder="Descrição do Evento"></textarea>
+
+            <div class="form-group participant-group">
+                <label>Quem participa:</label><br>
+                <input type="checkbox" id="ancients" name="event-participant" value="Anciãos">
+                <label for="ancients">Anciãos</label><br>
+
+                <input type="checkbox" id="deacons" name="event-participant" value="Diáconos">
+                <label for="deacons">Diáconos</label><br>
+
+                <input type="checkbox" id="coop_of" name="event-participant" value="Coop. Of">
+                <label for="coop_of">Coop. Of</label><br>
+
+                <input type="checkbox" id="coop_young" name="event-participant" value="Coop. Jovens">
+                <label for="coop_young">Coop. Jovens</label><br>
+
+                <input type="checkbox" id="adm" name="event-participant" value="ADM">
+                <label for="adm">ADM</label><br>
+
+                <input type="checkbox" id="sisters_pia" name="event-participant" value="Irmãs PIA">
+                <label for="sisters_pia">Irmãs PIA</label><br>
+
+                <input type="checkbox" id="doorkeepers" name="event-participant" value="Porteiros">
+                <label for="doorkeepers">Porteiros</label><br>
+
+                <input type="checkbox" id="council_ancients" name="event-participant" value="Conselho Anciãos">
+                <label for="council_ancients">Conselho Anciãos</label><br>
+
+                <input type="checkbox" id="council_deacons" name="event-participant" value="Conselho Diáconos">
+                <label for="council_deacons">Conselho Diáconos</label><br>
+            </div>
+            <button id="save-event-btn">Salvar</button>
+            <button id="delete-event-btn" class="delete-btn">Excluir</button>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
